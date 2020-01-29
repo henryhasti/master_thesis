@@ -1,2 +1,2 @@
 # master_thesis
-Contains all code for master thesis, and any sub-repositories
+Contains all code for master thesis on ambisonic musical source separation.
