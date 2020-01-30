@@ -3,18 +3,16 @@ c = 343; % speed of sound (m/s)
 rho0 = 1.29; % density (kg/m³)
 Z0 = c*rho0; % Characteristic impedance of the medium (kg/m²s)
 
-%All calculations taken from Pulkki's DirAC theory
+% All calculations taken from Pulkki's DirAC theory
 % Intensity (stored X, Y, Z after this step)
 counter = 1; % X, Y, Z for intensity
 figure
-for idx = [3,1,2] % Y, Z, X for B
-    I(counter).intensity = -1/Z0 * real(B(idx+1).spec .* conj(B(1).spec));
-    
-    
+for idx = [4,2,3] % Y, Z, X for B
+    I(counter).intensity = -1/Z0 * real(B(idx).spec .* conj(B(1).spec));
     % Plot the intensity spectrograms
 
     subplot(2,2,counter)
-    imagesc( t, w(1:floor(end/2)), I(counter).intensity);
+    imagesc( t, w, I(counter).intensity);
     set(gca,'YDir', 'normal');
     col = colorbar;
     col.Label.String = 'Intensity';
@@ -26,8 +24,8 @@ for idx = [3,1,2] % Y, Z, X for B
 end
 
 % DOA = angle of intensity vector
-[Omega(1).angle, Omega(2).angle] = cart2sph(I(1).intensity, ...
-    I(2).intensity, I(3).intensity);
+[Omega(1).angle, Omega(2).angle] = cart2sph(-I(1).intensity, ...
+    -I(2).intensity, -I(3).intensity);
 % Energy
 E = (abs(B(1).spec).^2 + abs(B(2).spec).^2 + abs(B(3).spec).^2 + ...
     abs(B(4).spec).^2)/2/Z0/c;
@@ -76,7 +74,7 @@ psi = 1 - psi./Eaveraged/c;
 %% Plot everything
 figure
 subplot(221)
-imagesc( t, w(1:floor(end/2)), Omega(1).angle); 
+imagesc( t, w, Omega(1).angle); 
 set(gca,'YDir', 'normal');
 col = colorbar;
 col.Label.String = 'Azimuth angle (radians)';
@@ -85,7 +83,7 @@ xlabel('Time (seconds)')
 ylabel('Frequency (Hz)')
 
 subplot(222)
-imagesc( t, w(1:floor(end/2)), Omega(2).angle); 
+imagesc( t, w, Omega(2).angle); 
 set(gca,'YDir', 'normal');
 col = colorbar;
 col.Label.String = 'Elevation';
@@ -94,7 +92,7 @@ xlabel('Time (seconds)')
 ylabel('Frequency (Hz)')
 
 subplot(223)
-imagesc( t, w(1:floor(end/2)), log(E)); 
+imagesc( t, w, log(E)); 
 set(gca,'YDir', 'normal');
 col = colorbar;
 col.Label.String = 'Energy (dB)';
@@ -103,7 +101,7 @@ xlabel('Time (seconds)')
 ylabel('Frequency (Hz)')
 
 subplot(224)
-imagesc( t, w(1:floor(end/2)), psi); 
+imagesc( t, w, psi); 
 set(gca,'YDir', 'normal');
 col = colorbar;
 col.Label.String = 'Diffuseness';

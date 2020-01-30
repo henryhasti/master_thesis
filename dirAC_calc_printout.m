@@ -4,14 +4,15 @@ clc
 close all
 %% Define parameters
 room = [10, 10, 10]; % Room dimensions
-rt60 = [0.1]; % Reverberation time
+rt60 = [1]; % Reverberation time
 rec = [ 5, 5, 5]; % Receiver positions
 fs = 44100; 
 
-% source positions
-src = [60, 50, 50;
-    50, 60, 50;
-    50, 50, 60]/10;
+% source positions (one at +1 meters from source in all 3 dimensions)
+src = [6,6,6];
+% src = [6, 5, 5;
+%     5, 6, 5;
+%     5, 5, 6];
 rec_orders = 1; % First order ambisonics
 
 %% Generate RIRs
@@ -70,6 +71,8 @@ end
 % This should be the signals received at each microphone
 sh_sigs = apply_source_signals_sh(sh_rirs, src_sigs);
 
+% Normalize
+sh_sigs(:, 2:4) = sh_sigs(:, 2:4)/sqrt(3);
 
 %% Check out ambisonic spectrograms
 figure
@@ -82,9 +85,8 @@ for idx = 1:4
     % B: spectrogram for each HOA
     [B(idx).spec, w, t] = spectrogram(sh_sigs(:, idx), hann(2048), ...
         1024, 2048, fs, 'yaxis');
-    B(idx).spec = B(idx).spec(1:floor(end/2), :); % Only positive spectrogram
     [m,n] = size(B(idx).spec);
-    imagesc( t, w(1:floor(end/2)), log(abs(B(idx).spec)) ); %spectrogram
+    imagesc( t, w, log(abs(B(idx).spec)) ); %spectrogram
     set(gca,'YDir', 'normal');
     col = colorbar;
     col.Label.String = 'Power/frequency (dB/Hz)';
