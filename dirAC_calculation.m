@@ -6,20 +6,23 @@ Z0 = c*rho0; % Characteristic impedance of the medium (kg/m²s)
 % All calculations taken from Pulkki's DirAC theory
 % Intensity (stored X, Y, Z after this step)
 counter = 1; % X, Y, Z for intensity
-figure
+if plots
+    figure
+end
 for idx = [4,2,3] % Y, Z, X for B
     I(counter).intensity = -1/Z0 * real(B(idx).spec .* conj(B(1).spec));
     % Plot the intensity spectrograms
-
-    subplot(2,2,counter)
-    imagesc( t, w, I(counter).intensity);
-    set(gca,'YDir', 'normal');
-    col = colorbar;
-    col.Label.String = 'Intensity';
-    title(['Intensity: Direction ' num2str(counter)])
-    xlabel('Time (seconds)')
-    ylabel('Frequency (Hz)')
-    counter = counter + 1; 
+    if plots
+        subplot(2,2,counter)
+        imagesc( t, w, I(counter).intensity);
+        set(gca,'YDir', 'normal');
+        col = colorbar;
+        col.Label.String = 'Intensity';
+        title(['Intensity: Direction ' num2str(counter)])
+        xlabel('Time (seconds)')
+        ylabel('Frequency (Hz)')
+    end
+    counter = counter + 1;
     
 end
 
@@ -48,7 +51,7 @@ for idx = 1:3 % for X, Y, and Z
             addMatrix(:, 1:shift) = zeros(m, shift);
         end
         I(idx).averaged = I(idx).averaged + addMatrix;
-
+        
         if idx == 1 % Only need to calculate Eavg once
             
             % Same logic as for intensity
@@ -59,7 +62,7 @@ for idx = 1:3 % for X, Y, and Z
             if shift > 0
                 addMatrixE(:, 1:shift) = zeros(m, shift);
             end
-            Eaveraged = Eaveraged + addMatrixE; 
+            Eaveraged = Eaveraged + addMatrixE;
         end
     end
     I(idx).averaged = I(idx).averaged/(2*numFrames + 1);
@@ -72,41 +75,42 @@ psi = sqrt(abs(I(1).averaged).^2 + abs(I(2).averaged).^2 + ...
 psi = 1 - psi./Eaveraged/c;
 
 %% Plot everything
-figure
-subplot(221)
-imagesc( t, w, Omega(1).angle); 
-set(gca,'YDir', 'normal');
-col = colorbar;
-col.Label.String = 'Azimuth angle (radians)';
-title('Azimuth angle')
-xlabel('Time (seconds)')
-ylabel('Frequency (Hz)')
-
-subplot(222)
-imagesc( t, w, Omega(2).angle); 
-set(gca,'YDir', 'normal');
-col = colorbar;
-col.Label.String = 'Elevation';
-title('Elevation angle (radians)')
-xlabel('Time (seconds)')
-ylabel('Frequency (Hz)')
-
-subplot(223)
-imagesc( t, w, log(E)); 
-set(gca,'YDir', 'normal');
-col = colorbar;
-col.Label.String = 'Energy (dB)';
-title('Energy')
-xlabel('Time (seconds)')
-ylabel('Frequency (Hz)')
-
-subplot(224)
-imagesc( t, w, psi); 
-set(gca,'YDir', 'normal');
-col = colorbar;
-col.Label.String = 'Diffuseness';
-title('Diffuseness')
-xlabel('Time (seconds)')
-ylabel('Frequency (Hz)')
-
+if plots
+    figure
+    subplot(221)
+    imagesc( t, w, Omega(1).angle);
+    set(gca,'YDir', 'normal');
+    col = colorbar;
+    col.Label.String = 'Azimuth angle (radians)';
+    title('Azimuth angle')
+    xlabel('Time (seconds)')
+    ylabel('Frequency (Hz)')
+    
+    subplot(222)
+    imagesc( t, w, Omega(2).angle);
+    set(gca,'YDir', 'normal');
+    col = colorbar;
+    col.Label.String = 'Elevation';
+    title('Elevation angle (radians)')
+    xlabel('Time (seconds)')
+    ylabel('Frequency (Hz)')
+    
+    subplot(223)
+    imagesc( t, w, log(E));
+    set(gca,'YDir', 'normal');
+    col = colorbar;
+    col.Label.String = 'Energy (dB)';
+    title('Energy')
+    xlabel('Time (seconds)')
+    ylabel('Frequency (Hz)')
+    
+    subplot(224)
+    imagesc( t, w, psi);
+    set(gca,'YDir', 'normal');
+    col = colorbar;
+    col.Label.String = 'Diffuseness';
+    title('Diffuseness')
+    xlabel('Time (seconds)')
+    ylabel('Frequency (Hz)')
+end
 
