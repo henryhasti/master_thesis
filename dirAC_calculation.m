@@ -14,13 +14,8 @@ for idx = [4,2,3] % Y, Z, X for B
     % Plot the intensity spectrograms
     if plots
         subplot(2,2,counter)
-        imagesc( t, w, I(counter).intensity);
-        set(gca,'YDir', 'normal');
-        col = colorbar;
-        col.Label.String = 'Intensity';
-        title(['Intensity: Direction ' num2str(counter)])
-        xlabel('Time (seconds)')
-        ylabel('Frequency (Hz)')
+        plotSpec(I(counter).intensity, t, w, ...
+            ['Intensity: Direction ' num2str(counter)])
     end
     counter = counter + 1;
     
@@ -36,7 +31,7 @@ E = (abs(B(1).spec).^2 + abs(B(2).spec).^2 + abs(B(3).spec).^2 + ...
 %% Diffuseness
 numFrames = 4; % Number of frames to average over in each time direction
 
-[m, n] = size(I(1).intensity); % All have same size though
+[m, n] = size(I(1).intensity); % All have same size
 
 Eaveraged = zeros(m,n);
 for idx = 1:3 % for X, Y, and Z
@@ -78,39 +73,14 @@ psi = 1 - psi./Eaveraged/c;
 if plots
     figure
     subplot(221)
-    imagesc( t, w, Omega(1).angle);
-    set(gca,'YDir', 'normal');
-    col = colorbar;
-    col.Label.String = 'Azimuth angle (radians)';
-    title('Azimuth angle')
-    xlabel('Time (seconds)')
-    ylabel('Frequency (Hz)')
+    plotSpec(Omega(1).angle, t, w, 'Azimuth angle (radians)', plots)
     
     subplot(222)
-    imagesc( t, w, Omega(2).angle);
-    set(gca,'YDir', 'normal');
-    col = colorbar;
-    col.Label.String = 'Elevation';
-    title('Elevation angle (radians)')
-    xlabel('Time (seconds)')
-    ylabel('Frequency (Hz)')
+    plotSpec(Omega(2).angle, t, w, 'Elevation angle (radians)', plots)
     
     subplot(223)
-    imagesc( t, w, log(E));
-    set(gca,'YDir', 'normal');
-    col = colorbar;
-    col.Label.String = 'Energy (dB)';
-    title('Energy')
-    xlabel('Time (seconds)')
-    ylabel('Frequency (Hz)')
+    plotSpec(log(E), t, w, 'Energy (dB)', plots)
     
     subplot(224)
-    imagesc( t, w, psi);
-    set(gca,'YDir', 'normal');
-    col = colorbar;
-    col.Label.String = 'Diffuseness';
-    title('Diffuseness')
-    xlabel('Time (seconds)')
-    ylabel('Frequency (Hz)')
+    plotSpec(psi, t, w, 'Diffuseness', plots)
 end
-
