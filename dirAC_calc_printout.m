@@ -1,26 +1,30 @@
 %% Creation of RIRs, application to signals, parameter calculation
-clearvars -except master maxlim PPEidx rt60 src thresh
+clearvars -except master maxlim PPEidx rt60 src thresh plots
 clc
 close all
 %% Define parameters
+global plots; % Whether to generate figures
 room = [10, 10, 10]; % Room dimensions
-rt60 = [0.05]; % Reverberation time
+if ~exist('rt60', 'var')
+    rt60 = [0.5]; % Reverberation time
+    maxlim = 0.5; % How many seconds reverb is calculated for
+end
 rec = [ 5, 5, 5]; % Receiver positions
 fs = 44100;
-maxlim = 0.05; % How many seconds reverb is calculated for
-plots = true; % Whether to generate plots
 
 % source positions (one at +1 meters from source in all 3 dimensions)
 % src = [6, 5, 5;
 %     5, 6, 5;
 %     5, 5, 6];
-if ~exist('src')
+if ~exist('src', 'var')
     src = [1,5.01,5.01];
 end
 realDOA = src-rec;
-[realDOA(2), realDOA(1), ~] = cart2sph(realDOA(1), realDOA(2), realDOA(3));
+[realDOA(1), realDOA(2), ~] = cart2sph(realDOA(1), realDOA(2), realDOA(3));
 realDOA(3) = [];
-master(PPEidx).realDOA = realDOA;
+if exist('master', 'var')
+    master(PPEidx).realDOA = realDOA;
+end
 
 rec_orders = 1; % First order ambisonics
 
@@ -111,7 +115,7 @@ end
 
 
 %% Calculate and plot DirAC params
-dirAC_calculation;
+[I, Omega, E, psi] = dirAC_calculation(B, t, w);
 
 
 clc

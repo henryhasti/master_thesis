@@ -5,7 +5,7 @@
 
 for PPEidx = 1:1
     
-    rt60 = 0.1; %rand(1)*1.5 + 0.01;
+    rt60 = rand(1)*1.5 + 0.01;
     maxlim = rt60;
     thresh = rand(1)*0.9 + 0.1;
     % Each source coordinate can be anywhere except with 0.5 meters of rec
@@ -24,11 +24,8 @@ for PPEidx = 1:1
     
     DOA = zeros(1,2);
     
-    disp(['Elevation. Actual: ' num2str(master(PPEidx).realDOA(1))])
-    DOA(1) = peakPick(theta, 0.7, 0.5, 1/(theta(1,3)-theta(1,2)));
-    
-    disp(['Azimuth. Actual: ' num2str(master(PPEidx).realDOA(2))])
-    DOA(2) = peakPick(phi, 0.7, 0.5, 1/(phi(1,3)-phi(1,2)));
+    DOA(1) = peakPick(phi, 0.7, 0.5, 1/hop);
+    DOA(2) = peakPick(theta, 0.7, 0.5, 1/hop);
     
     master(PPEidx).DOA = DOA;
     

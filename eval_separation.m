@@ -19,7 +19,7 @@ SDR = 10*log10(dot(sigOrig, sigOrig)/dot(sigReturned-sigOrig, sigReturned-sigOri
 
 SIR = 10*log10(dot(sigOrig, sigOrig)/dot(e_interf, e_interf));
 
-SNR = 10*log10(dot(sigOrig + e_interf)/dot(e_noise, e_noise));
+SNR = 10*log10(dot(sigOrig + e_interf, sigOrig + e_interf)/dot(e_noise, e_noise));
 
 SAR = 10*log10(dot(sigOrig+e_interf+e_noise, sigOrig+e_interf+e_noise)/...
     dot(e_artif, e_artif));

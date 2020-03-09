@@ -1,8 +1,10 @@
-%% Implement DirAC equations
+function [I, Omega, E, psi] = dirAC_calculation(B, t, w)
+global plots;
+% Implement DirAC equations
 c = 343; % speed of sound (m/s)
 rho0 = 1.29; % density (kg/m³)
 Z0 = c*rho0; % Characteristic impedance of the medium (kg/m²s)
-
+%%
 % All calculations taken from Pulkki's DirAC theory
 % Intensity (stored X, Y, Z after this step)
 counter = 1; % X, Y, Z for intensity
@@ -22,6 +24,7 @@ for idx = [4,2,3] % Y, Z, X for B
 end
 
 % DOA = angle of intensity vector
+% phi, theta
 [Omega(1).angle, Omega(2).angle] = cart2sph(-I(1).intensity, ...
     -I(2).intensity, -I(3).intensity);
 % Energy
@@ -83,4 +86,5 @@ if plots
     
     subplot(224)
     plotSpec(psi, t, w, 'Diffuseness', plots)
+end
 end
