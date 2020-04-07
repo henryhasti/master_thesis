@@ -57,8 +57,9 @@ for idx = 1:length(w)
     end
 end
 
-%% Plot it all
+
 if plots
+    %% Plot it all
     figure
     subplot(2, 2, counter)
     plot(theta(1,:), theta(2,:), theta(1,:), theta(3,:))

@@ -1,5 +1,6 @@
 %% Creation of RIRs, application to signals, parameter calculation
-clearvars -except master maxlim PPEidx rt60 src thresh plots
+clearvars -except master maxlim PPEidx rt60 src thresh plots src_sigs ...
+    bass drums other vocals
 clc
 close all
 %% Define parameters
@@ -20,10 +21,9 @@ if ~exist('src', 'var')
     src = [1,5.01,5.01];
 end
 realDOA = src-rec;
-[realDOA(1), realDOA(2), ~] = cart2sph(realDOA(1), realDOA(2), realDOA(3));
-realDOA(3) = [];
+[realDOAaz, realDOAel, ~] = cart2sph(realDOA(:,1), realDOA(:,2), realDOA(:,3));
 if exist('master', 'var')
-    master(PPEidx).realDOA = realDOA;
+    master(PPEidx).realDOA = [realDOAaz, realDOAel];
 end
 
 rec_orders = 1; % First order ambisonics
@@ -31,25 +31,6 @@ rec_orders = 1; % First order ambisonics
 %% Generate RIRs
 TEST_SCRIPT_SH;
 
-%% Prepare audio
-
-%tt = (1:1/fs:20)';
-%src_sigs = [cos(2*pi*1000*tt) cos(2*pi*5000*tt) cos(2*pi*10000*tt)];
-%src_sigs = rand(43381,1) - 0.5;
-
-if true
-    % Load, convert to mono
-%     [bass, ~] = audioread('bass.wav');
-%     bass = sum(bass, 2)/2;
-%     [drums, ~] = audioread('drums.wav');
-%     drums = sum(drums, 2)/2;
-    [other, ~] = audioread('other.wav');
-    other = sum(other, 2)/2;
-%     [vocals, ~] = audioread('vocals.wav');
-%     vocals = sum(vocals, 2)/2;
-    
-    src_sigs = other; %[bass, drums, other, vocals];
-end
 %% Check out isolated spectrograms
 
 %figure
@@ -65,18 +46,18 @@ end
 
 if plots
     figure
-%     subplot(221)
-%     spectrogram(bass, hann(2048), 1024, 2048, fs, 'yaxis');
-%     title('Bass')
-%     subplot(222)
-%     spectrogram(drums, hann(2048), 1024, 2048, fs, 'yaxis')
-%     title('Drums')
-%     subplot(223)
+    subplot(221)
+    spectrogram(bass, hann(2048), 1024, 2048, fs, 'yaxis');
+    title('Bass')
+    subplot(222)
+    spectrogram(drums, hann(2048), 1024, 2048, fs, 'yaxis')
+    title('Drums')
+    subplot(223)
     spectrogram(other, hann(2048), 1024, 2048, fs, 'yaxis')
     title('Other')
-%     subplot(224)
-%     spectrogram(vocals, hann(2048), 1024, 2048, fs, 'yaxis')
-%     title('Vocals')
+    subplot(224)
+    spectrogram(vocals, hann(2048), 1024, 2048, fs, 'yaxis')
+    title('Vocals')
 end
 %% Generate sound scenes
 % Each source is convolved with the respective mic IR, and summed with

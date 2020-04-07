@@ -72,8 +72,8 @@ psi = sqrt(abs(I(1).averaged).^2 + abs(I(2).averaged).^2 + ...
     abs(I(3).averaged).^2);
 psi = 1 - psi./Eaveraged/c;
 
-%% Plot everything
 if plots
+    %% Plot everything
     figure
     subplot(221)
     plotSpec(Omega(1).angle, t, w, 'Azimuth angle (radians)', plots)
