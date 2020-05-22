@@ -1,10 +1,22 @@
-function [I, Omega, E, psi] = dirAC_calculation(B, t, w)
+function [I, Omega, E, psi, t, w] = dirAC_calculation(sh_sigs, fs)
 global plots;
 % Implement DirAC equations
 c = 343; % speed of sound (m/s)
 rho0 = 1.29; % density (kg/m³)
 Z0 = c*rho0; % Characteristic impedance of the medium (kg/m²s)
 %%
+for idx = 1:4
+    winSize = 2048;
+    % B: spectrogram for each HOA
+    [B(idx).spec, w, t] = spectrogram(sh_sigs(:, idx), hann(winSize), ...
+        winSize/2, winSize, fs, 'yaxis');
+    %[m,n] = size(B(idx).spec);
+    if plots
+        subplot(2,2,idx)
+        plotSpec(log(abs(B(idx).spec)), t, w, [mix(idx).title ': dB/Hz'])
+    end
+end
+
 % All calculations taken from Pulkki's DirAC theory
 % Intensity (stored X, Y, Z after this step)
 counter = 1; % X, Y, Z for intensity
@@ -32,7 +44,7 @@ E = (abs(B(1).spec).^2 + abs(B(2).spec).^2 + abs(B(3).spec).^2 + ...
     abs(B(4).spec).^2)/2/Z0/c;
 
 %% Diffuseness
-numFrames = 4; % Number of frames to average over in each time direction
+numFrames = 3; % Number of frames to average over in each time direction
 
 [m, n] = size(I(1).intensity); % All have same size
 

@@ -15,7 +15,7 @@ function DOA = peakPick(angleVec, noiseFloor, minSep, peakFs)
 % Built in flag: received negative noiseFloor means this function is being
 % called recursively, and should not check for peak at pi case
 
-prom = 100; % prominence. Test value for now
+prom = 500; % prominence. Test value for now
 
 if noiseFloor > 0
     angleVecSmooth = smooth(angleVec(2,:));
@@ -26,15 +26,17 @@ if noiseFloor > 0
     [~,locs, w, p] = findpeaks(angleVecSmooth, peakFs, 'MinPeakDistance', ...
         minSep, 'MinPeakHeight',minPeak, 'MinPeakProminence', prom); % locs in indices
     locsRad = angleVec(1,round(locs*peakFs)); % in radians
-    for idx = 1:length(locsRad)
-        disp([num2str(locsRad(idx)) ': width: ' num2str(w(idx)) ' prominence: ' num2str(p(idx))])
-    end
 else
     [~,locs] = max(angleVec(2,:));
     locsRad = angleVec(1, locs);
 end
 
-
+%% Temporary debugging step (need permanent fix) 20 May
+if isempty(locsRad)
+    disp('No peaks found')
+    DOA = [];
+    return
+end
 
 if noiseFloor > 0 && angleVec(1,1) < -3.11 && ...
         (locsRad(1) < angleVec(1,1)+minSep/2 || locsRad(end) > angleVec(1,end) - minSep/2)

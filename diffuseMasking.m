@@ -1,91 +1,65 @@
+function [phi, theta, phiMask, thetaMask] = diffuseMasking(psi, Omega, hop, thresh, w)
 %% Implement binary mask based on diffuseness threshold
+% psi = spectrogram showing diffuseness values
+% Omega = (1).angle is azimuth spectrogram, (2) is elevation
+% hop = sampling frequency of angles
+% w = scale of frequency axis. Optional. If passed in, a mel scale
+% weighting will be used in calculating the angular histograms
+% 
+% phi = azimuth angle distribution
+% theta = elevation angle distribution
+% phi and thetaMask = spectrograms with only thresholded angles remaining
+% Organized as row vectors with angles; number of spectrogram bins at angle
+% Angles always get mapped to the next LOWEST angle bin
 global plots;
-counter = 1;
-if ~exist('thresh', 'var')
-    thresh  = .6; % Max allowable diffuseness
-end
-% Bins with too much diffuseness cut out. Mask==1 is what is saved
-mask = ones(m, n);
-mask(psi > thresh) = nan;
 
-% Values that do get cut out
-revMask = ones(m,n); 
-revMask(~isnan(mask)) = nan;
+if nargin < 5 % don't want to use mel weighting
+    w = nan;
+end
+
+% Bins with too much diffuseness cut out. Mask==1 is what is saved
+mask = ones(size(psi));
+mask(psi > thresh) = nan;
 
 % Mask applied to diffuseness and DOA
 psiMask = psi.*mask;
 phiMask = Omega(1).angle.*mask;
-phiRevMask = Omega(1).angle.*revMask;
 thetaMask = Omega(2).angle.*mask;
-thetaRevMask = Omega(2).angle.*revMask;
 
 %% Angular statistics
-% Plot energy as a function of azimuth and elevation angles
+% Track energy as a function of azimuth and elevation angles
 
-hop = 0.01; % "sampling frequency" of angles
-phi = -pi:hop:pi;
-phi = [phi (phi(end) + hop)];
-theta = -pi/2:hop:pi/2;
-theta = [theta (theta(end) + hop)];
+% Calculate histograms for azimuth and elevation angles
+phi = genAngleStats(hop, phiMask, pi, w);
+theta = genAngleStats(hop, thetaMask, pi/2, w);
 
-% Angle; number of DOAs at angle; number of elements eliminated by mask
-phi = vertcat(phi, zeros(1, length(phi)), zeros(1, length(phi)));
-theta = vertcat(theta, zeros(1, length(theta)), zeros(1, length(theta)));
-
-% Loop through every bin of elev and azim angles
-for idx = 1:length(w)
-    for jdx = 1:length(t)
-        % Process DOAs that mask cuts out
-        if isnan(mask(idx, jdx))
-            phiTemp = phiRevMask(idx, jdx); % angle value
-            angBin = ceil((phiTemp + pi)/hop) + 1; % nearest sampled angle
-            phi(3, angBin) = phi(3, angBin) + 1; % Add angle to that angle
-            
-            thetaTemp = thetaRevMask(idx, jdx);
-            angBin = ceil((thetaTemp + pi/2)/hop) + 1;
-            theta(3, angBin) = theta(3, angBin) + 1;
-        else
-            % Process DOAs that mask leaves in place
-            phiTemp = phiMask(idx, jdx); 
-            angBin = ceil((phiTemp + pi)/hop) + 1;
-            phi(2, angBin) = phi(2, angBin) + 1;
-            
-            thetaTemp = thetaMask(idx, jdx); 
-            angBin = ceil((thetaTemp + pi/2)/hop) + 1;
-            theta(2, angBin) = theta(2, angBin) + 1;
-        end
-    end
-end
-
-
+%% Make plots of everything
 if plots
-    %% Plot it all
+    counter = 1;
+    %% Plot angular histograms
     figure
     subplot(2, 2, counter)
-    plot(theta(1,:), theta(2,:), theta(1,:), theta(3,:))
+    plot(theta(1,:), theta(2,:))
     title(['Elevation: diffuseness ' num2str(thresh)])
-    legend('Saved', 'masked')
     
     subplot(2, 2, counter + 2)
-    polarplot(theta(1,:), theta(2,:), theta(1,:), theta(3,:))
+    polarplot(theta(1,:), theta(2,:))
     title(['Elevation: diffuseness ' num2str(thresh)])
-    legend('Saved', 'masked')
     
     counter = counter + 1;
     
     subplot(2, 2, counter)
-    plot(phi(1,:), phi(2,:), phi(1,:), phi(3,:))
+    plot(phi(1,:), phi(2,:))
     title(['Azimuth: diffuseness ' num2str(thresh)])
-    legend('Saved', 'masked')
     
     subplot(2, 2, counter + 2)
-    polarplot(phi(1,:), phi(2,:), phi(1,:), phi(3,:))
+    polarplot(phi(1,:), phi(2,:))
     title(['Azimuth: diffuseness ' num2str(thresh)])
-    legend('Saved', 'masked')
+    
+    %% Plot masking results
 end
-
-%%
-if plots
+if false
+    %%
     figure
     plotSpec(psiMask, t, w, 'psi')
     colormap(vertcat([1,1,1], colormap)) %sets nan to white
@@ -95,4 +69,5 @@ if plots
     figure
     plotSpec(thetaMask, t, w, 'elevation')
     colormap(vertcat([1,1,1], colormap))
+end
 end
