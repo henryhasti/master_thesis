@@ -25,33 +25,35 @@ maxlim_master = [100, 2000, 4000, 7000];
 fs = 44100;
 % different weighting schemes: Basic, MaxRE, in-phase
 weights(1).wt = [1,1,1,1];
-weights(2).wt = [.775, .4, .4, .4];
+weights(2).wt = [.775, .4, .4, .4]; %MaxRE works best
 weights(3).wt = [.5, .1, .1, .1];
 
 % Store ratio results
-master(19, 4, 10, 3).SDR = [];
-master(19, 4, 10, 3).SIR = [];
-master(19, 4, 10, 3).SAR = [];
-master(19, 4, 10, 3).perm = [];
+master(4, 4, 10).SDR = [];
+master(4, 4, 10).SIR = [];
+master(4, 4, 10).SAR = [];
+master(4, 4, 10).perm = [];
 %%
 tic
 for song = 1:10 % song being evaluated
     
     % Clean, anechoic signals to be compared against
     songDir = song_master(song+2).title;
-    src_wav(1).track = [anechoicDir songDir '/drums.wav'];
-    src_wav(2).track = [anechoicDir songDir '/vocals.wav'];
+    src_wav(1).track = [anechoicDir songDir '/bass.wav'];
+    src_wav(2).track = [anechoicDir songDir '/drums.wav'];
+    src_wav(3).track = [anechoicDir songDir '/other.wav'];
+    src_wav(4).track = [anechoicDir songDir '/vocals.wav'];
     
-    for angSep = 0:10:180 % separation angle being evaluated
+    for azcase = 1:4 % separation angle being evaluated
         
         for maxlim = maxlim_master % Reverb time being evaluated
             
             % Received SH signals to be separated
-            matFile = ['azim_' num2str(angSep) '_rev_' num2str(maxlim)...
+            matFile = ['azcase_' num2str(azcase) '_rev_' num2str(maxlim)...
                 '_song_' num2str(song) '.mat'];
             load(matFile)
             
-            for cardioid = 1:3 % Beamform pattern being evaluated
+            for cardioid = 2 % Beamform pattern being evaluated (MaxRE is best)
                 
                 beamWeights = weights(cardioid).wt; % Weights to implement pattern
                 beam_sigs = beamforming(realDOA, sh_sigs, beamWeights); % Do beamforming
@@ -75,10 +77,10 @@ for song = 1:10 % song being evaluated
                 
                 % Evaluate separation
                 [SDR,SIR,SAR,perm] = eval_caller(estimateDir, src_wav, src, rec);
-                master(angSep/10+1, maxlimCtr, song, cardioid).SDR = SDR;
-                master(angSep/10+1, maxlimCtr, song, cardioid).SIR = SIR;
-                master(angSep/10+1, maxlimCtr, song, cardioid).SAR = SAR;
-                master(angSep/10+1, maxlimCtr, song, cardioid).perm = perm;
+                master(azcase, maxlimCtr, song).SDR = SDR;
+                master(azcase, maxlimCtr, song).SIR = SIR;
+                master(azcase, maxlimCtr, song).SAR = SAR;
+                master(azcase, maxlimCtr, song).perm = perm;
                 
                 % Clear old estimates
                 %system('rm results/EstimatedSource_1.wav')
@@ -87,8 +89,8 @@ for song = 1:10 % song being evaluated
         end
     end
     % Partway through save
-    save('spatFiltVerifyData.mat', 'master')
+    save('spatFiltVerifyData4src.mat', 'master')
     disp([num2str(song) ' is the song, the time is ' num2str(toc)])
 end
 
-save('spatFiltVerifyData.mat', 'master')
+save('spatFiltVerifyData4src.mat', 'master')

@@ -6,6 +6,8 @@
 % If the target folder (anechoicData) already has tracks in it, this script
 % will simply add to those
 
+% Edited to update one track that was missing bass in the section
+
 %% Select 10 random songs
 % from 50 song Test subset. Move to anechoic data folder
 
@@ -32,16 +34,17 @@ end
 
 addpath(genpath('/home/hhasti/Documents/Research/Data/anechoicData'))
 workDir = '/home/hhasti/Documents/Research/Data/anechoicData/';
-fileList = dir(workDir);
+%fileList = dir(workDir);
 
-for idx = 3:length(fileList)
+%for idx = 3:length(fileList)
     
-    partsList = dir([workDir fileList(idx).name]); 
+    %partsList = dir([workDir fileList(idx).name]); 
+    partsList = '/home/hhasti/Documents/Research/Data/Test/013 - Drumtracks - Ghost Bitch';
     
-    [bass, fs] = audioread([workDir fileList(idx).name '/' partsList(3).name]);
-    [drums, fs] = audioread([workDir fileList(idx).name '/' partsList(4).name]);
-    [other, fs] = audioread([workDir fileList(idx).name '/' partsList(5).name]);
-    [vocals, fs] = audioread([workDir fileList(idx).name '/' partsList(6).name]);
+    [bass, fs] = audioread([partsList '/bass.wav']);
+    [drums, fs] = audioread([partsList '/drums.wav']);
+    [other, fs] = audioread([partsList '/other.wav']);
+    [vocals, fs] = audioread([partsList '/vocals.wav']);
     
     songLength = length(bass);
     
@@ -49,13 +52,16 @@ for idx = 3:length(fileList)
     startPoint = randi(songLength - 5*fs); 
     endPoint = startPoint + 5*fs;
     
-    % Re-write only shortened segment to wav file
-    audiowrite([workDir fileList(idx).name '/' partsList(3).name], bass(startPoint:endPoint), fs);
-    audiowrite([workDir fileList(idx).name '/' partsList(4).name], drums(startPoint:endPoint), fs);
-    audiowrite([workDir fileList(idx).name '/' partsList(5).name], other(startPoint:endPoint), fs);
-    audiowrite([workDir fileList(idx).name '/' partsList(6).name], vocals(startPoint:endPoint), fs);
+    %%
+    soundsc(vocals(startPoint:endPoint), fs);
     
-end
+    %% Re-write only shortened segment to wav file
+    audiowrite([workDir '013 - Drumtracks - Ghost Bitch/bass.wav'], bass(startPoint:endPoint), fs);
+    audiowrite([workDir '013 - Drumtracks - Ghost Bitch/drums.wav'], drums(startPoint:endPoint), fs);
+    audiowrite([workDir '013 - Drumtracks - Ghost Bitch/other.wav'], other(startPoint:endPoint), fs);
+    audiowrite([workDir '013 - Drumtracks - Ghost Bitch/vocals.wav'], vocals(startPoint:endPoint), fs);
+    
+%end
 
 
 

@@ -1,12 +1,93 @@
 %% DOA estimator verification master parser
 % Parses data in master to be useful
 
-%% Graphically represent data/error
+%% Standard error calculator
+% Great circle distance between calcDOA and realDOA is the error
+clear
+roundNum = 3;
+hop = 2*0.01;
+load('DOAestVerifyData.mat');
+%load(['DOAestVerifyData_round' num2str(roundNum) '.mat']);
+
+DOAerrormax = zeros(4, 19, 10);
+DOAerrormin = zeros(4, 19, 10);
+
+for maxlim = 1:4
+    for angSep = 1:19
+        for songIdx = 1:10
+            calcDOA = master(angSep, maxlim, songIdx).DOA;
+            realDOA = master(angSep, maxlim, songIdx).realDOA;
+            
+            arclen = zeros(2,2);
+            for idx = 1:2
+                for jdx = 1:2
+                    
+                    arclen(idx, jdx) = greatCircleDistance(calcDOA(2, idx), ...
+                        calcDOA(1, idx), realDOA(2, jdx), realDOA(1, jdx), 1);
+                    %This function downloaded from
+                    %https://www.mathworks.com/matlabcentral/fileexchange/
+                    %23026-compute-the-great-circle-distance-between-two-points
+                    
+                end
+            end
+            
+            if arclen(1,1)+arclen(2,2) < arclen(1,2)+arclen(2,1)
+                if arclen(1,1) > pi-hop && arclen(1,1) < pi+hop
+                    arclen180(1,1) = 0;
+                end
+                if arclen(2,2) > pi-hop && arclen(2,2) < pi+hop
+                    arclen180(2,2) = 0;
+                end
+                DOAerrormax(maxlim, angSep, songIdx) = max(arclen(1,1), arclen(2,2));
+                DOAerrormin(maxlim, angSep, songIdx) = min(arclen(1,1), arclen(2,2));
+            else
+                if arclen(1,2) > pi-hop && arclen(1,2) < pi+hop
+                    arclen180(1,2) = 0;
+                end
+                if arclen(2,1) > pi-hop && arclen(2,1) < pi+hop
+                    arclen180(2,1) = 0;
+                end
+                DOAerrormax(maxlim, angSep, songIdx) = max(arclen(1,2), arclen(2,1));
+                DOAerrormin(maxlim, angSep, songIdx) = min(arclen(1,2), arclen(2,1));
+            end
+            
+        end
+        
+    end
+end
+
+%% Graphically display
+reverb{1} = 0.01;
+reverb{2} = 0.2;
+reverb{3} = 0.4;
+reverb{4} = 0.7;
+
+DOAerror(1, 19, :) = nan;
+DOAerror180(1, 19, :) = nan;
+
+figure
+for idx = 1:4
+    
+    subplot(2,2,idx)
+    meanVal = mean(squeeze(DOAerrormax(idx,:,:)), 2, 'omitnan');
+    plot(0:10:180, rad2deg(meanVal(1:end)))
+    hold on
+    meanVal180 = mean(squeeze(DOAerrormin(idx,:,:)), 2, 'omitnan');
+    plot(0:10:180, rad2deg(meanVal180(1:end)))
+    title([num2str(reverb{idx}) ' s reverb time'])
+    xlabel('Degrees btwn sources')
+    ylabel('Average error (degreess)')
+    
+    
+    
+end
+
+%% Graphically represent data/error (obsolete)
 % 4 plots, one for each reverb
 % Average across songs
 % Plot all DOAs that appear as function of angular separation
 clear
-roundNum = 2;
+roundNum = 3;
 load(['DOAestVerifyData_round' num2str(roundNum) '.mat']);
 reverb{1} = 0.01;
 reverb{2} = 0.2;
@@ -119,8 +200,8 @@ fmeasure = 2*precision.*recall./(precision + recall);
 figure
 for idx = 1:4
     
-   plot(deg2rad(0:18)*10, fmeasure(:,idx))
-   hold on
+    plot(deg2rad(0:18)*10, fmeasure(:,idx))
+    hold on
     
 end
 legend('0.01', '0.2', '0.4', '0.7')

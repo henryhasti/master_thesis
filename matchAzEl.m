@@ -32,7 +32,7 @@ for idx = 1:length(phiEst) % match each phi with its theta
     
     thetaDist(2,:) = smooth(smooth(smooth(thetaDist(2,:))));
     
-    theta = peakPick(thetaDist, -0.3, 0.5, 1/hop);
+    theta = peakPick(thetaDist, 1, 0.5, 1/hop);
     
     correlatedAngles(2,idx) = theta;
     

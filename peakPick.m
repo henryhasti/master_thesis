@@ -1,9 +1,9 @@
-function DOA = peakPick(angleVec, noiseFloor, minSep, peakFs)
+function DOA = peakPick(angleVec, nsrc, minSep, peakFs)
 
 % Pick peaks to determine where sounds come from
 % angleVec is 2+ rows by many columns: 1st row is angle, 2nd row is
 % energy values
-% Peaks must be at least noiseFloor*max peak to be considered
+% There are nsrc DOAs to return
 % Returned peaks must be at least minSep (angle) apart
 % fs is the angular sampling rate
 
@@ -15,54 +15,49 @@ function DOA = peakPick(angleVec, noiseFloor, minSep, peakFs)
 % Built in flag: received negative noiseFloor means this function is being
 % called recursively, and should not check for peak at pi case
 
-prom = 500; % prominence. Test value for now
-
-if noiseFloor > 0
-    angleVecSmooth = smooth(angleVec(2,:));
-    
-    noise = min(angleVecSmooth(2:end-1)); % Lowest point in histogram: noise floor
-    peak = max(angleVecSmooth(2:end-1)); % highest point in histogram: most prominent DOA
-    minPeak = (peak-noise)*noiseFloor + noise; % peaks must get above noise floor
-    [~,locs, w, p] = findpeaks(angleVecSmooth, peakFs, 'MinPeakDistance', ...
-        minSep, 'MinPeakHeight',minPeak, 'MinPeakProminence', prom); % locs in indices
-    locsRad = angleVec(1,round(locs*peakFs)); % in radians
-else
-    [~,locs] = max(angleVec(2,:));
-    locsRad = angleVec(1, locs);
+% Extend graph by double so that pi singularity doesn't matter, smooth
+if angleVec(1, end) > 3.1 % only for azimuth, not elevation
+    angleVec = [angleVec(:, 1:end-1) angleVec(:, 2: end-1)];
+    angleVec(1, round(end/2)+1:end) = angleVec(1, round(end/2+1:end)) +2*pi;
 end
+angleVecSmooth = smooth(angleVec(2,:));
 
-%% Temporary debugging step (need permanent fix) 20 May
-if isempty(locsRad)
-    disp('No peaks found')
-    DOA = [];
-    return
+% Find candidate peaks (4*nsrc: double spectrogram + echo false positives)
+[pks,locs] = findpeaks(angleVecSmooth, peakFs, 'MinPeakDistance', minSep); % locs in indices
+locsRad = angleVec(1,round(locs*peakFs))+1/peakFs; % in radians
+
+% [~, index] = sort(pks); % indices smallest to largest peaks
+% pks(index(1:end-nsrc*4)) = [];
+% locsRad(index(1:end-nsrc*4)) = [];
+
+
+DOA = [];
+counter = 0;
+while length(DOA) < nsrc
+    
+   [~, I] = max(pks); % index of max peak
+   
+   if isempty(I) % If no peaks detected
+       if size(DOA) > 0
+           DOA = [DOA DOA(1)]; % Assume two sources at biggest DOA
+       else
+           DOA = [DOA 0]; % Assume source at 0 (arbitrary)
+       end
+   else
+       
+       % Eliminate this peak and copied peak
+       peakLoc = locsRad(I); % Radian location of this peak
+       hiPeakLoc = locsRad(I) + 2*pi; % Locations of copied peaks
+       loPeakLoc = locsRad(I) - 2*pi;
+       idxToDelete = [locsRad > loPeakLoc-minSep/2 & locsRad < loPeakLoc+minSep/2; ...
+           locsRad > peakLoc-minSep/2 & locsRad < peakLoc+minSep/2; ...
+           locsRad > hiPeakLoc-minSep/2 & locsRad < hiPeakLoc+minSep/2];
+       idxToDelete = logical(sum(idxToDelete));
+       locsRad(idxToDelete) = [];
+       pks(idxToDelete) = [];
+       DOA = [DOA peakLoc];
+   end
+   
 end
-
-if noiseFloor > 0 && angleVec(1,1) < -3.11 && ...
-        (locsRad(1) < angleVec(1,1)+minSep/2 || locsRad(end) > angleVec(1,end) - minSep/2)
-    % Noisefloor negative indicates this is the second time through the
-    % fucntion. This case has already been checked.
-    % If angleVec doesn't span from -pi:pi, it is the elevation angle
-    % A location of a peak is within minSep of pi => Check if source is at pi
-    
-    energy = circshift(angleVec(2,2:end-1), round(minSep/2*peakFs)); % Shift minSep/2 to the right
-    angles = angleVec(1,2:end-1) - minSep/2;
-    energy(angles > angleVec(1,1)+minSep/2) = 0; % delete activity higher than minSep/2
-    DOApi = peakPick(vertcat(angles, energy), -noiseFloor, minSep, peakFs);
-    
-    if DOApi < - pi
-        DOApi = DOApi + 2*pi;
-    elseif DOApi > pi
-        DOApi = DOApi - 2*pi;
-    end
-    % Eliminate the fractured peak
-    locsRad(locsRad < angleVec(1,1)+minSep/2) = [];
-    locsRad(locsRad > angleVec(1,end) - minSep/2) = [];
-    
-    locsRad = [locsRad, DOApi];
-end
-
-DOA = locsRad;
-
 
 end

@@ -10,7 +10,7 @@ fileList = dir(workDir);
 
 fileList = fileList(3:end);
 
-song2play = 10; % Vary between 1 and 10
+song2play = 3; % Vary between 1 and 10
 
 [bass, fs] = audioread([workDir fileList(song2play).name '/bass.wav']);
 [drums, fs] = audioread([workDir fileList(song2play).name '/drums.wav']);

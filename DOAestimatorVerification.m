@@ -14,8 +14,7 @@ peakFs = 1/hop; % resolution of angle bins
 % Song number: 1 to 10 (corresponding to the testing subset alphabetically
 master(19, 4, 10).DOA = []; % Estimated DOA
 master(19, 4, 10).realDOA = []; % Actual DOA
-master(19, 4, 10).error = []; % Difference between estimated and actual
-
+nsrc = 2;
 
 angSep_master = 0:10:180;
 maxlim_master = [100, 2000, 4000, 7000];
@@ -35,13 +34,13 @@ for angSep = angSep_master
             
             % Ranking diffuseness
             psiSum = sum(sum(psi));
-            thresh = psiSum/219350;
+            thresh = 0.2 + psiSum/219350;
             
             % Get angle distributions
-            [phi, theta, phiMask, thetaMask] = diffuseMasking(psi, Omega, hop, thresh, w);
+            [phi,theta,phiMask,thetaMask]=diffuseMasking(psi,Omega,hop,thresh,w);
             
             % Get azimuth DOAs
-            DOAaz = peakPick(phi, noiseFloor, minSep, peakFs);
+            DOAaz = peakPick(phi, nsrc, minSep, peakFs);
             if isempty(DOAaz)
                 disp(['Song ' num2str(song) ' reverb ' num2str(maxlim) ...
                     ' angSep ' num2str(angSep)])
@@ -49,13 +48,7 @@ for angSep = angSep_master
             
             % Get complete DOA pairs (azimuth, elevation)
             DOA = matchAzEl(hop, phiMask, thetaMask, DOAaz);
-            
-            try
-                error = abs(DOA-realDOA);
-            catch
-                error = nan;
-            end
-            
+                        
             % Which reverberation time we have
             if maxlim == 100
                 maxlimCtr = 1;
