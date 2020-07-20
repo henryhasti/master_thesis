@@ -1,5 +1,6 @@
 %% DOA estimator verification
 % Justifies accuracy of DOA estimator algorithm.
+% Updated for 4 sources
 % Test cases:
 fs = 44100;
 hop = 0.01;
@@ -12,20 +13,20 @@ peakFs = 1/hop; % resolution of angle bins
 % Angular separation in degrees: (idx-1)*10
 % Maxlim for reverb: [0.01, 0.2, 0.4, 0.7] seconds
 % Song number: 1 to 10 (corresponding to the testing subset alphabetically
-master(19, 4, 10).DOA = []; % Estimated DOA
-master(19, 4, 10).realDOA = []; % Actual DOA
-nsrc = 2;
+master(4, 4, 10).DOA = []; % Estimated DOA
+master(4, 4, 10).realDOA = []; % Actual DOA
+nsrc = 4;
 
-angSep_master = 0:10:180;
+%angSep_master = 0:10:180;
 maxlim_master = [100, 2000, 4000, 7000];
 song_master = 1:10;
 tic
 % Calculate error between actual and calculated DOA for every test case
-for angSep = angSep_master
+for azCase = 1:4 %angSep = angSep_master
     for maxlim = maxlim_master
         for song = song_master
             
-            matFile = ['azim_' num2str(angSep) '_rev_' num2str(maxlim)...
+            matFile = ['azcase_' num2str(azCase) '_rev_' num2str(maxlim)...
                 '_song_' num2str(song) '.mat'];
             load(matFile)
             
@@ -61,13 +62,13 @@ for angSep = angSep_master
             end
             
             % Add values
-            master(angSep/10+1, maxlimCtr, song).DOA = DOA;
-            master(angSep/10+1, maxlimCtr, song).realDOA = realDOA;
+            master(azCase, maxlimCtr, song).DOA = DOA;
+            master(azCase, maxlimCtr, song).realDOA = realDOA;
             
         end
-        save('DOAestVerifyData', 'master')
+        save('DOAestVerifyData4src', 'master')
     end
-    disp(['Completed loop ang_sep = ' num2str(angSep)])
+    disp(['Completed loop ang_sep = ' num2str(azCase)])
     toc
 end
-save('DOAestVerifyData', 'master')
+save('DOAestVerifyData4src', 'master')

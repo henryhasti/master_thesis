@@ -13,7 +13,7 @@ anechoicDir = 'Data/anechoicData/'; % Where all 10 songs are
 maxlim_master = [100, 2000, 4000, 7000];
 
 % This will only get used for fs, src, and rec
-matFile = 'azim_180_rev_100_song_1.mat';
+matFile = 'azcase_1_rev_100_song_1.mat';
 load(matFile)
 
 master(4, 10).SDR = [];
@@ -25,12 +25,14 @@ for songIdx = 1:10
     
     % Clean, anechoic signals to be compared against
     songDir = song_master(songIdx+2).title;
-    src_wav(1).track = [anechoicDir songDir '/drums.wav'];
-    src_wav(2).track = [anechoicDir songDir '/vocals.wav'];
+    src_wav(1).track = [anechoicDir songDir '/bass.wav'];
+    src_wav(2).track = [anechoicDir songDir '/drums.wav'];
+    src_wav(3).track = [anechoicDir songDir '/other.wav'];
+    src_wav(4).track = [anechoicDir songDir '/vocals.wav'];
     for maxlim = maxlim_master
         
         % wav file of combined signals (NMF script will use)
-        filename = ['azim_180_rev_' num2str(maxlim) '_song_' num2str(songIdx) '.wav'];
+        filename = ['azcase_1_rev_' num2str(maxlim) '_song_' num2str(songIdx) '.wav'];
         NMFsepDrums;
         
         % Which reverberation time we have
@@ -53,11 +55,11 @@ for songIdx = 1:10
         
     end
     
-    save('NMFverifyDataSepDrums.mat', 'master')
+    save('NMFverifyData4src.mat', 'master')
     disp([num2str(songIdx) ' is the song, the time is ' num2str(toc)])
 end
 
-save('NMFverifyDataSepDrums.mat', 'master')
+save('NMFverifyData4src.mat', 'master')
 
 
 

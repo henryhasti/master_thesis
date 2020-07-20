@@ -25,8 +25,8 @@ rec_orders = 1; % First order ambisonics
 
 %maxlim = maxlimMaster(reverbTime);
 %azim = azimMaster(azimuthAngle).data;
-
-elev = deg2rad([0 0 0 0]);
+azim = 0.07;
+elev = deg2rad([0]);
 rad = 1 * ones(1, length(azim));
 [srcX, srcY, srcZ] = sph2cart(azim, elev, rad);
 src = [srcX' srcY' srcZ'] + rec;

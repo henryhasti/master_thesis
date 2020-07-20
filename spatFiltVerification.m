@@ -29,10 +29,11 @@ weights(2).wt = [.775, .4, .4, .4]; %MaxRE works best
 weights(3).wt = [.5, .1, .1, .1];
 
 % Store ratio results
-master(4, 4, 10).SDR = [];
-master(4, 4, 10).SIR = [];
-master(4, 4, 10).SAR = [];
-master(4, 4, 10).perm = [];
+load spatFiltVerifyData4src.mat
+% master(4, 4, 10).SDR = [];
+% master(4, 4, 10).SIR = [];
+% master(4, 4, 10).SAR = [];
+% master(4, 4, 10).perm = [];
 %%
 tic
 for song = 1:10 % song being evaluated

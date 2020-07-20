@@ -90,7 +90,7 @@ paramTemplates.deltaF = deltaF;
 paramTemplates.numComp = numComp;
 paramTemplates.numBins = numBins;
 paramTemplates.numTemplateFrames = numTemplateFrames;
-initW = initTemplates(paramTemplates,'drums');
+initW = initTemplates(paramTemplates,'random');
 
  % generate initial activations
 paramActivations.numComp = numComp;

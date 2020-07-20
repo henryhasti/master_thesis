@@ -35,6 +35,10 @@ for idx = 3:length(fileList) % ignore . and .. directories
    se = [se audio]; % add this source estimate to se matrix
 end
 
+if ~exist('fs', 'var')
+    fs = 44100;
+end
+
 sampDel = round(d/c*fs); % number of samples later signals are expected
 
 se = circshift(se, -sampDel); % start signal when mic first excited

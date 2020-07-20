@@ -1,5 +1,5 @@
 %% Editable section%%%%%%%%
-mixture_wavname = '/home/hhasti/Documents/Research/Data/simWavs/azim_30_rev_7000_song_8.wav';
+mixture_wavname = '/home/hhasti/Documents/Research/Data/4srcSimWavs/azcase_1_rev_2000_song_1.wav';
 results_dir = '/home/hhasti/Documents/Research/results/'; % Results folder
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -56,7 +56,7 @@ end
 x_mix = sh_sigs; %audioread(mixture_wavname);
 
 % Number of sources
-J = 2; 
+J = 4; 
 
 % Mixture number of samples and number of channels (I)
 [nbSamples_Mix,I] = size(x_mix);
@@ -113,8 +113,8 @@ end
 % initialization ~ init gain balance for each source for instantaneous mixture)
 sources{1}.A.data = [1;sqrt(3)*sin(el2pol(realDOA(2,1)))*sin(realDOA(1,1));sqrt(3)*cos(el2pol(realDOA(2,1)));sqrt(3)*sin(el2pol(realDOA(2,1)))*cos(realDOA(1,1))];
 sources{2}.A.data = [1;sqrt(3)*sin(el2pol(realDOA(2,2)))*sin(realDOA(1,2));sqrt(3)*cos(el2pol(realDOA(2,2)));sqrt(3)*sin(el2pol(realDOA(2,2)))*cos(realDOA(1,2))];
-%sources{3}.A.data = [1;sqrt(3)*sin(el2pol(realDOA(2,3)))*sin(realDOA(1,3));sqrt(3)*cos(el2pol(realDOA(2,3)));sqrt(3)*sin(el2pol(realDOA(2,3)))*cos(realDOA(1,3))];
-%sources{4}.A.data = [1;sqrt(3)*sin(el2pol(realDOA(2,4)))*sin(realDOA(1,4));sqrt(3)*cos(el2pol(realDOA(2,4)));sqrt(3)*sin(el2pol(realDOA(2,4)))*cos(realDOA(1,4))];
+sources{3}.A.data = [1;sqrt(3)*sin(el2pol(realDOA(2,3)))*sin(realDOA(1,3));sqrt(3)*cos(el2pol(realDOA(2,3)));sqrt(3)*sin(el2pol(realDOA(2,3)))*cos(realDOA(1,3))];
+sources{4}.A.data = [1;sqrt(3)*sin(el2pol(realDOA(2,4)))*sin(realDOA(1,4));sqrt(3)*cos(el2pol(realDOA(2,4)));sqrt(3)*sin(el2pol(realDOA(2,4)))*cos(realDOA(1,4))];
 
 % --- Write FASST_data structure in FASST input xml file
 

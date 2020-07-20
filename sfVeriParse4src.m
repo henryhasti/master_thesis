@@ -1,8 +1,8 @@
 %% DOA estimator verification master parser
 % Parses data in master to be useful
 
-%% Start with SIR (but a simple find and replace to work with SIR or SIR)
-% master is stored as (angle, reverb, song, beamformer).SIR, SIR, SIR, perm
+%% Start with SAR (but a simple find and replace to work with SAR or SAR)
+% master is stored as (angle, reverb, song, beamformer).SAR, SAR, SAR, perm
 % Angle = 0 to 180º in 10º steps
 % reverb = 0.01, 0.2, 0.4, 0.7 seconds
 % songs from 1 to 10
@@ -25,22 +25,22 @@ reverb_master = [0.01, 0.2, 0.4, 0.7];
 
 for azIdx = 1:4
     
-    % Store SIRs for drums and vocal estimates, for every angle and for
+    % Store SARs for drums and vocal estimates, for every angle and for
     % every song
-    SIRbass = zeros(10, 4);
-    SIRdrums = zeros(10, 4);
-    SIRother = zeros(10,4);
-    SIRvocals = zeros(10, 4);
+    SARbass = zeros(10, 4);
+    SARdrums = zeros(10, 4);
+    SARother = zeros(10,4);
+    SARvocals = zeros(10, 4);
     
     
     for maxlim = 1:4
         
         for songIdx = 1:10
             
-            SIRbass(songIdx, maxlim) = master(azIdx, maxlim, songIdx).SIR(1);
-            SIRdrums(songIdx, maxlim) = master(azIdx, maxlim, songIdx).SIR(2);
-            SIRother(songIdx, maxlim) = master(azIdx, maxlim, songIdx).SIR(3);
-            SIRvocals(songIdx, maxlim) = master(azIdx, maxlim, songIdx).SIR(4);
+            SARbass(songIdx, maxlim) = master(azIdx, maxlim, songIdx).SAR(1);
+            SARdrums(songIdx, maxlim) = master(azIdx, maxlim, songIdx).SAR(2);
+            SARother(songIdx, maxlim) = master(azIdx, maxlim, songIdx).SAR(3);
+            SARvocals(songIdx, maxlim) = master(azIdx, maxlim, songIdx).SAR(4);
             
         end
     end
@@ -48,41 +48,55 @@ for azIdx = 1:4
     % instruments
     figure(bass)
     subplot(2, 2, azIdx)
-    plot(reverb_master, min(SIRbass), 'ok', reverb_master, max(SIRbass), 'ok', reverb_master, mean(SIRbass, 'omitnan'), 'ok', reverb_master, zeros(size(maxlim)))
+    plot(reverb_master, mean(SARbass)-std(SARbass), 'or', reverb_master, ...
+        mean(SARbass)+std(SARbass), 'or', reverb_master, mean(SARbass), ...
+        'ok', reverb_master, zeros(size(maxlim)))
     title(['Room setup ' num2str(azIdx)])
-    ylabel('SIR (dB)')
+    ylabel('SAR (dB)')
     xlabel('Reverb times (s)')
-    sgtitle('Bass')
+    grid on
+    grid minor
+    ylim([-5 40]);
+    sgtitle('Bass mean SAR and error')
     
     figure(drums)
     subplot(2, 2, azIdx)
-    plot(reverb_master, min(SIRdrums), 'ok', reverb_master, max(SIRdrums), 'ok', reverb_master, mean(SIRdrums, 'omitnan'), 'ok', reverb_master, zeros(size(maxlim)))
+    plot(reverb_master, mean(SARdrums)-std(SARdrums), 'or', reverb_master, ...
+        mean(SARdrums)+std(SARdrums), 'or', reverb_master, mean(SARdrums), ...
+        'ok', reverb_master, zeros(size(maxlim)))
     title(['Room setup ' num2str(azIdx)])
-    ylabel('SIR (dB)')
+    ylabel('SAR (dB)')
     xlabel('Reverb times (s)')
-    sgtitle('Drums')
+    grid on
+    grid minor
+    ylim([-5 40]);
+    sgtitle('Drums mean SAR and error')
     
     figure(other)
     subplot(2, 2, azIdx)
-    plot(reverb_master, min(SIRother), 'ok', reverb_master, max(SIRother), 'ok', reverb_master, mean(SIRother, 'omitnan'), 'ok', reverb_master, zeros(size(maxlim)))
+    plot(reverb_master, mean(SARother)-std(SARother), 'or', reverb_master, ...
+        mean(SARother)+std(SARother), 'or', reverb_master, mean(SARother), ...
+        'ok', reverb_master, zeros(size(maxlim)))
     title(['Room setup ' num2str(azIdx)])
-    ylabel('SIR (dB)')
+    ylabel('SAR (dB)')
     xlabel('Reverb times (s)')
-    sgtitle('other')
+    grid on
+    grid minor
+    ylim([-5 40]);
+    sgtitle('Other mean SAR and error')
     
     figure(vocals)
     subplot(2, 2, azIdx)
-    plot(reverb_master, min(SIRvocals), 'ok', reverb_master, max(SIRvocals), 'ok', reverb_master, mean(SIRvocals, 'omitnan'), 'ok', reverb_master, zeros(size(maxlim)))
+    plot(reverb_master, mean(SARvocals)-std(SARvocals), 'or', reverb_master, ...
+        mean(SARvocals)+std(SARvocals), 'or', reverb_master, mean(SARvocals), ...
+        'ok', reverb_master, zeros(size(maxlim)))
     title(['Room setup ' num2str(azIdx)])
-    ylabel('SIR (dB)')
+    ylabel('SAR (dB)')
     xlabel('Reverb times (s)')
-    sgtitle('vocals')
-    
-    
-    
-    
-    
-    
+    grid on
+    grid minor
+    ylim([-5 40]);
+    sgtitle('Vocals mean SAR and error')
     
     
     

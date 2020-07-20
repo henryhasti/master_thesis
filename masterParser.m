@@ -29,41 +29,56 @@ for maxlim=1:4
     for angleIdx = angSep/10+1
         
         for songIdx = 1:10
-            drumsHOA(songIdx, angleIdx) = sepHOA(angleIdx, maxlim, songIdx).SDR(1);
-            vocalsHOA(songIdx, angleIdx) = sepHOA(angleIdx, maxlim, songIdx).SDR(2);
+            drumsHOA(songIdx, angleIdx) = sepHOA(angleIdx, maxlim, songIdx).SAR(1);
+            vocalsHOA(songIdx, angleIdx) = sepHOA(angleIdx, maxlim, songIdx).SAR(2);
             
-            drumsSpat(songIdx, angleIdx) = spatFilt(angleIdx, maxlim, songIdx, 2).SDR(1);
-            vocalsSpat(songIdx, angleIdx) = spatFilt(angleIdx, maxlim, songIdx, 2).SDR(2);
+            drumsSpat(songIdx, angleIdx) = spatFilt(angleIdx, maxlim, songIdx, 2).SAR(1);
+            vocalsSpat(songIdx, angleIdx) = spatFilt(angleIdx, maxlim, songIdx, 2).SAR(2);
             
-            drumsNMF(songIdx, angleIdx) = NMF(maxlim, songIdx).SDR(1);
-            vocalsNMF(songIdx, angleIdx) = NMF(maxlim, songIdx).SDR(2);
+            drumsNMF(songIdx, angleIdx) = NMF(maxlim, songIdx).SAR(1);
+            vocalsNMF(songIdx, angleIdx) = NMF(maxlim, songIdx).SAR(2);
         end
     end
     
     figure(drums)
     subplot(2, 2, maxlim)
-    plot(angSep, mean(drumsHOA, 'omitnan'), angSep, mean(drumsSpat), ...
-        angSep, mean(drumsNMF), angSep, zeros(size(angSep)))
+    plot(angSep, mean(drumsHOA, 'omitnan'), 'k', angSep, mean(drumsSpat), 'b',...
+        angSep, mean(drumsNMF), 'r')
     title([num2str(reverb{maxlim}) ' s reverb'])
-    ylabel('SDR (dB)')
+    ylabel('SAR (dB)')
     xlabel('Degrees between sources')
-    legend({'HOA', 'spatial', 'NMF'}, 'Location', 'southeast')
+    ylim([-15 35])
+    xlim([0 180])
+    if maxlim==1
+        legend({'HOA', 'Spatial', 'NMF'}, 'Location', 'southeast')
+    else
+        legend({'HOA', 'Spatial', 'NMF'}, 'Location', 'northeast')
+    end
+    grid on
+    grid minor
     
     figure(vocals)
     subplot(2, 2, maxlim)
-    plot(angSep, mean(vocalsHOA, 'omitnan'), angSep, mean(vocalsSpat), ...
-        angSep, mean(vocalsNMF), angSep, zeros(size(angSep)))
+    plot(angSep, mean(vocalsHOA, 'omitnan'), 'k', angSep, mean(vocalsSpat), 'b', ...
+        angSep, mean(vocalsNMF), 'r')
     title([num2str(reverb{maxlim}) ' s reverb'])
-    ylabel('SDR (dB)')
+    ylabel('SAR (dB)')
     xlabel('Degrees between sources')
-    legend({'HOA', 'spatial', 'NMF'}, 'Location', 'southeast')
-    
+    ylim([-15 35])
+    xlim([0 180])
+    if maxlim==1
+        legend({'HOA', 'Spatial', 'NMF'}, 'Location', 'southeast')
+    else
+        legend({'HOA', 'Spatial', 'NMF'}, 'Location', 'northeast')
+    end
+    grid on
+    grid minor
     
 end
 
 figure(drums)
-sgtitle('Drums SDR performance - average')
+sgtitle('Drums mean SAR for three methods')
 
 figure(vocals)
-sgtitle('Vocals SDR performance - average')
+sgtitle('Vocals mean SAR for three methods')
 

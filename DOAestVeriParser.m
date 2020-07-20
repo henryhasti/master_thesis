@@ -3,10 +3,13 @@
 
 %% Standard error calculator
 % Great circle distance between calcDOA and realDOA is the error
-clear
+%clear
+all = figure;
 roundNum = 3;
 hop = 2*0.01;
 load('DOAestVerifyData.mat');
+
+
 %load(['DOAestVerifyData_round' num2str(roundNum) '.mat']);
 
 DOAerrormax = zeros(4, 19, 10);
@@ -62,26 +65,36 @@ reverb{2} = 0.2;
 reverb{3} = 0.4;
 reverb{4} = 0.7;
 
-DOAerror(1, 19, :) = nan;
-DOAerror180(1, 19, :) = nan;
+DOAerror = DOAerrormax + DOAerrormin; % total error at configuration
+angles = 0:10:180;
 
-figure
+figure(all)
 for idx = 1:4
     
-    subplot(2,2,idx)
-    meanVal = mean(squeeze(DOAerrormax(idx,:,:)), 2, 'omitnan');
-    plot(0:10:180, rad2deg(meanVal(1:end)))
+    DOAerr = rad2deg(squeeze(DOAerror(idx,:,:)))';
+    %DOAerrMUS = rad2deg(squeeze(DOAerrMUSIC(idx,:,:)))';
+    
     hold on
-    meanVal180 = mean(squeeze(DOAerrormin(idx,:,:)), 2, 'omitnan');
-    plot(0:10:180, rad2deg(meanVal180(1:end)))
+    subplot(2,2,idx)
+    plot(angles, mean(DOAerr)-std(DOAerr), 'r', angles, ...
+        mean(DOAerr)+std(DOAerr), 'r', angles, mean(DOAerr), 'k')
+    %meanVal180 = mean(squeeze(DOAerrormin(idx,:,:)), 2, 'omitnan');
+    %plot(0:10:180, rad2deg(meanVal180(1:end)))
     title([num2str(reverb{idx}) ' s reverb time'])
     xlabel('Degrees btwn sources')
-    ylabel('Average error (degreess)')
-    
-    
+    ylabel('Average error (degrees)')
+    ylim([-50 200])
+%     if idx == 1
+%         legend('Parametric', 'MUSIC', 'Location', 'northwest')
+%     else
+%         legend('Parametric', 'MUSIC')
+%     end
     
 end
 
+sgtitle('DOA error average and standard deviation')
+
+if false
 %% Graphically represent data/error (obsolete)
 % 4 plots, one for each reverb
 % Average across songs
@@ -212,3 +225,4 @@ legend('0.01', '0.2', '0.4', '0.7')
 %% Save
 
 %save('DOAestVerifyData.mat', 'master', 'fneg', 'fpos', 'tpos')
+end

@@ -83,7 +83,7 @@ deltaF = fs / paramSTFT.blockSize;
 
  % 3. apply NMF variants to STFT magnitude
 % set common parameters
-numComp = 2; %3;
+numComp = 4; %3;
 numIter = 30;
 numTemplateFrames = 110; % for pitched instruments
 
