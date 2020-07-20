@@ -1,6 +1,9 @@
 %% Henry edited this section
 % Reference: https://ieeexplore.ieee.org/abstract/document/1143830
 % R.O. Schmidt
+function est_dirs_music = MUSICDOAest(sh_sigs, nSrc)
+% Returns DOA info (az in first row, el in second)
+% sh_sigs is the ambisonic info for the song (4 channels)
 
 aziElev2aziPolar = @(dirs) [dirs(:,1) pi/2-dirs(:,2)]; % function to convert from azimuth-inclination to azimuth-elevation
 grid_dirs = grid2dirs(5,5,0,0); % Grid of directions to evaluate DoA estimation
@@ -18,8 +21,6 @@ fs = 44100;
 % signal modeling
 order = 1;
 nSH = (order+1)^2;
-src_dirs = [0 0; 70 0];
-nSrc = 2;
 
 
 % Calculate sphCOV
@@ -54,13 +55,16 @@ sphCOV = real(PSD_mat);
 
 % DoA estimation
 [P_music, est_dirs_music] = sphMUSIC(sphCOV, grid_dirs, nSrc);
-est_dirs_music = est_dirs_music*180/pi;
-% plots results
-plotDirectionalMapFromGrid(P_music, 5, 5, [], 0, 0);
-%src_dirs_deg = src_dirs*180/pi;
-line_args = {'linestyle','none','marker','o','color','r', 'linewidth',1.5,'markersize',12};
-%line(src_dirs_deg(:,1), src_dirs_deg(:,2), line_args{:});
-line_args = {'linestyle','none','marker','x','color','r', 'linewidth',1.5,'markersize',12};
-line(est_dirs_music(:,1), est_dirs_music(:,2), line_args{:});
-xlabel('Azimuth (deg)'), ylabel('Elevation (deg)'), title('MUSIC DoA, o: true directions, x: estimated')
-h = gcf; h.Position(3) = 1.5*h.Position(3); h.Position(4) = 1.5*h.Position(4);
+est_dirs_music = est_dirs_music';
+if false
+    est_dirs_music = est_dirs_music*180/pi;
+    % plots results
+    plotDirectionalMapFromGrid(P_music, 5, 5, [], 0, 0);
+    %src_dirs_deg = src_dirs*180/pi;
+    line_args = {'linestyle','none','marker','o','color','r', 'linewidth',1.5,'markersize',12};
+    %line(src_dirs_deg(:,1), src_dirs_deg(:,2), line_args{:});
+    line_args = {'linestyle','none','marker','x','color','r', 'linewidth',1.5,'markersize',12};
+    line(est_dirs_music(:,1), est_dirs_music(:,2), line_args{:});
+    xlabel('Azimuth (deg)'), ylabel('Elevation (deg)'), title('MUSIC DoA, o: true directions, x: estimated')
+    h = gcf; h.Position(3) = 1.5*h.Position(3); h.Position(4) = 1.5*h.Position(4);
+end

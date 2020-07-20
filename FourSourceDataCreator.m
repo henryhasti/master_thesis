@@ -1,5 +1,7 @@
 %% 4 source Data creator
 % Generates parameters for data, calls createData, saves data
+% Edited to replace only song 3 (originally missing bass) with updated
+% version
 clear
 
 azim_master{1} = [-pi, -pi/2, 0, pi/2];
@@ -14,7 +16,7 @@ saveDirWav = '/home/hhasti/Documents/Research/Data/4srcSimWavs/';
 songFolder = dir(workDir);
 
 tic
-for songIdx = 3:12
+for songIdx = 5%3:12
     
     song = [workDir songFolder(songIdx).name];
     [bass, fs] = audioread([song '/bass.wav']);
